@@ -21,11 +21,11 @@ router.get("/:line", async (req, res) => {
   if (fs.existsSync(filename)) {
     fileHelper.readFile(filename)
     .then(data => 
-        res.send(data)
+        res.send({body: data})
     )
   } else { 
     res.set("Content-Type","text/plain")
-    res.status(500).send('not found')}
+    res.status(404).send('not found')}
 });
 
 // POST /data/{lineNo}
@@ -39,6 +39,18 @@ router.post("/:line", async (req, res) => {
    * 2) url을 통해, article contents를 얻어낸다. ( JSDOM을 이용하여, medium 블로그의 글 내용을 얻을 수 있도록 하세요.)
    * 3) 얻어낸 article contents를 저장한다. (ex : filename , data/${lineNo}.txt)
    */
+  fileHelper.readLineFromSourceList(lineNo)
+  .then(url => fetchHelper.retrieveArticle(url))
+  .then(string => new JSDOM(string))
+  .then(dom => {
+    let article = dom.window.document.querySelector('article').textContent
+    fileHelper.writeFile(`./data/${lineNo}.txt`,JSON.stringify(article))
+    res.send('완료')}
+  
+  )
+  // eslint-disable-next-line no-console
+  .catch(err => {console.log(err); res.status(404).send('not found')})
+
 });
 
 module.exports = router;
