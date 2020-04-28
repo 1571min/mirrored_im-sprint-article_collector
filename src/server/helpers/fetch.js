@@ -10,7 +10,7 @@ async function retrieveArticle(url) {
           data += chunk;
         })
         .on('end', ()=>{
-          console.log(data)
+          //console.log(data)
           resolve(data);
         })
         .on('error', err =>
