@@ -17,6 +17,15 @@ router.get("/:line", async (req, res) => {
   /*
    * fs.existsSync 를 이용하여, 존재하지 않는 파일에 대해서 에러 핸들링을 할 수 있어야 합니다.
    */
+  //console.log(fs.existsSync(filename))
+  if (fs.existsSync(filename)) {
+    fileHelper.readFile(filename)
+    .then(data => 
+        res.send(data)
+    )
+  } else { 
+    res.set("Content-Type","text/plain")
+    res.status(500).send('not found')}
 });
 
 // POST /data/{lineNo}
