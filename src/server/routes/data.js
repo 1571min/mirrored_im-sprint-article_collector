@@ -48,15 +48,26 @@ router.post('/:line', async (req, res) => {
     let url = await fileHelper.readLineFromSourceList(lineNo);
     let string = await fetchHelper.retrieveArticle(url);
     let dom = new JSDOM(string);
-    let article = dom.window.document.querySelector('article').textContent;
-    let result = fileHelper.writeFile(
+
+    let tempURL = url.split('.')[0];
+    let article = '';
+    switch (tempURL) {
+      case 'https://medium':
+        article = dom.window.document.querySelector('article').textContent;
+        break;
+      case 'https://velog':
+        article = dom.window.document.querySelector('.sc-esjQYD').textContent;
+        break;
+      default:
+        break;
+    }
+
+    let result = await fileHelper.writeFile(
       `./data/${lineNo}.txt`,
       JSON.stringify(article)
     );
-    console.log(result);
     res.send('ok');
   } catch (error) {
-    console.log(error);
     res.status(404).send('Not found');
   }
 });
