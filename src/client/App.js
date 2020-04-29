@@ -14,13 +14,14 @@ const customStyles = {
 };
 
 // Make sure to bind modal to your appElement (http://reactcommunity.org/react-modal/accessibility/)
-Modal.setAppElement('#yourAppElement')
+//Modal.setAppElement('#yourAppElement')
 
 export default class App extends Component {
   state = {
     nowEditing: false,
     nowSaving: false,
     modalIsOpen : false,
+    inputValue: null,
     currentItem: {
       id: null,
       body: null,
@@ -95,7 +96,23 @@ export default class App extends Component {
       }
     });
   }
+  handleClickSaveAddSource(){
+    this.setState({sources: this.state.sources + this.state.inputValue + '\n'})
+    fetch('/api/source',
+    {
+      method:'POST',
+      headers: {
+        Accept: 'text/plain',
+        'Content-Type': 'text/plain'
+      },
+      body: this.state.sources
+    })
+    this.setState({modalIsOpen:false})
+  }
 
+  handleChangeInputValue(e){
+    this.setState({inputValue: e.target.value})
+  }
   toggleMode() {
     this.setState(prevState => ({ nowEditing: !prevState.nowEditing }));
   }
@@ -103,11 +120,6 @@ export default class App extends Component {
   openModal() {
     this.setState({modalIsOpen:true})
   }
-
-  // afterOpenModal() {
-  //   this.setState({})
-  //   subtitle.style.color = '#f00';
-  // }
 
   closeModal(){
     this.setState({modalIsOpen:false})
@@ -126,25 +138,20 @@ export default class App extends Component {
 
     return (
       <div> 
-        <button onClick={this.openModal}>url추가</button>
+        <button onClick={this.openModal.bind(this)}>url추가</button>
       <Modal
-        isOpen={this.modalIsOpen}
+        isOpen={this.state.modalIsOpen}
         //onAfterOpen={this.afterOpenModal}
-        onRequestClose={this.closeModal}
+        onRequestClose={this.state.closeModal}
         style={customStyles}
         contentLabel="Example Modal"
       >
 
-        <h2>Hello</h2>
-        <button onClick={this.closeModal}>close</button>
-        <div>I am a modal</div>
-        <form>
-          <input />
-          <button>tab navigation</button>
-          <button>stays</button>
-          <button>inside</button>
-          <button>the modal</button>
-        </form>
+        <h2>원하는 url을 입력하세요.</h2>
+        <input value={this.state.inputValue} onChange={this.handleChangeInputValue.bind(this)}/>
+        <button onClick={this.handleClickSaveAddSource.bind(this)}>url 저장</button>
+        <button onClick={this.closeModal}>취소</button>
+
       </Modal>
 
         <h3>article collector (for medium blog)</h3>
