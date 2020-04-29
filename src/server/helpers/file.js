@@ -2,8 +2,8 @@ const fs = require("fs");
 
 async function writeFile(filename, body) {
   return new Promise((resolve, reject) => {
-    const data = new Uint8Array(Buffer.from(body));
     // TODO: 특정 파일이름(filename)을 가진 텍스트를 저장할 수 있도록 구현하세요.
+    const data = new Uint8Array(Buffer.from(body));
     fs.writeFile(filename, data, (err) => {
       if(err){
         reject(err)

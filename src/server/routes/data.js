@@ -9,24 +9,20 @@ const router = express.Router();
 const { JSDOM } = jsdom;
 
 // GET /data/{lineNo}
-router.get("/:line", async (req, res) => {
+router.get('/:line', async (req, res) => {
   const filename = `./data/${req.params.line}.txt`;
-  res.set("Content-Type", "application/json");
-
-  // TODO : Help function을 이용하여, 주어진 filename의 내용을 읽을 수 있도록 구현하세요.
-  /*
-   * fs.existsSync 를 이용하여, 존재하지 않는 파일에 대해서 에러 핸들링을 할 수 있어야 합니다.
-   */
-  //console.log(fs.existsSync(filename))
+  res.set('Content-Type', 'application/json');
+  let body = {};
   if (fs.existsSync(filename)) {
-    fileHelper.readFile(filename)
-    .then(data => 
-        res.send({body: data})
-    )
-  } else { 
-    res.set("Content-Type","text/plain")
-    res.status(404).send('not found')}
+    body.body = await fileHelper.readFile(filename);
+    body.status = '';
+  } else {
+    body.status = 'nonexist';
+  }
+  body.id = `${req.params.line}`;
+  res.send(body);
 });
+
 
 // POST /data/{lineNo}
 router.post("/:line", async (req, res) => {
@@ -45,12 +41,9 @@ router.post("/:line", async (req, res) => {
   .then(dom => {
     let article = dom.window.document.querySelector('article').textContent
     fileHelper.writeFile(`./data/${lineNo}.txt`,JSON.stringify(article))
-    res.send('완료')}
-  
-  )
+    res.send('ok')})
   // eslint-disable-next-line no-console
   .catch(err => {console.log(err); res.status(404).send('not found')})
-
 });
 
 module.exports = router;
